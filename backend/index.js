@@ -4,6 +4,14 @@ const connectDB = require("./db/connect");
 const cors = require("cors");
 const app = express();
 
+//routes & middlewares
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/auth", authController);
+
+//mongodb connect
+//starting server
 const start = async () => {
   try {
     //mongodb connect
