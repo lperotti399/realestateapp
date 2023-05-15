@@ -79,6 +79,7 @@ propertyController.get("/find/:id", async (req, res) => {
 });
 
 //create a property
+// make a post request to create a new property using express and enovoking the Router function
 propertyController.post("/", verifyToken, async (req, res) => {
   try {
     const newProperty = await Property.create({
@@ -92,5 +93,45 @@ propertyController.post("/", verifyToken, async (req, res) => {
 });
 
 //update property
+//make a put request to update your properties using express and envoke the Router function
+//
+propertyController.put("/:id", verifyToken, async (req, res) => {
+  try {
+    const property = await Property.findById(req.params.id);
+    if (property.currentOwner !== req.user.id) {
+      throw new Error("You are not allowed to update other people properties");
+    } else {
+      const updatedProperty = await Property.findByIdAndUpdate(
+        req.params.id,
+        {
+          $set: req.body,
+        },
+        { new: true }
+      );
+      return res.status(200).json(updatedProperty);
+    }
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+});
 
 //delete property
+propertyController.delete("/:id", verifyToken, async (req, res) => {
+  try {
+    const property = await Property.findById(req.param.id);
+
+    if (property.currentOwner !== req.user.id) {
+      throw new new Error(
+        "You are not allowed to delete other people properties"
+      )();
+    } else {
+      await property.delete();
+
+      return res.status(200).json(error.message);
+    }
+  } catch (error) {
+    return res.status(500).json(error.message);
+  }
+});
+
+module.exports = propertyController;
