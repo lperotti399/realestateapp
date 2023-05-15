@@ -3,6 +3,7 @@ const dotenv = require("dotenv").config();
 const connectDB = require("./db/connect");
 const cors = require("cors");
 const authController = require("./controllers/authController");
+const propertyController = require("./controllers/propertyController");
 const app = express();
 
 //routes & middlewares
