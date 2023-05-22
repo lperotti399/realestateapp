@@ -29,16 +29,14 @@ propertyController.get("/find/featured", async (req, res) => {
 propertyController.get("/find", async (req, res) => {
   const type = req.query;
   //{type: 'beach'}
+  let properties = [];
   try {
     if (type) {
-      const properties = await Property.find(type).populate(
-        "currenctOwner",
-        "-password"
-      );
-      return res.status(200).json(properties);
+      properties = await Property.find(type).populate("owner", "-password");
     } else {
-      return res.status(500).json({ msg: "No such type" });
+      properties = await Property.find({});
     }
+    return res.status(200).json(properties);
   } catch (error) {
     return res.status(500).json(error.message);
   }
@@ -63,7 +61,7 @@ propertyController.get("/find/types", async (req, res) => {
 //get individual property
 propertyController.get("/find/:id", async (req, res) => {
   try {
-    const property = await Property.find(req.params.id).populate(
+    const property = await Property.findById(req.params.id).populate(
       "currentOwner",
       "-password"
     );
@@ -74,6 +72,7 @@ propertyController.get("/find/:id", async (req, res) => {
       return res.status(200).json(property);
     }
   } catch (error) {
+    console.log(req.params.id);
     return res.status(500).json(error.message);
   }
 });
@@ -98,9 +97,11 @@ propertyController.post("/", verifyToken, async (req, res) => {
 propertyController.put("/:id", verifyToken, async (req, res) => {
   try {
     const property = await Property.findById(req.params.id);
-    if (property.currentOwner !== req.user.id) {
+    //console.log(req.user.id);
+    if (property.currentOwner.toString() !== req.user.id.toString()) {
       throw new Error("You are not allowed to update other people properties");
     } else {
+      //const findProperty = await Property.findById(req.params.id);
       const updatedProperty = await Property.findByIdAndUpdate(
         req.params.id,
         {
@@ -109,6 +110,8 @@ propertyController.put("/:id", verifyToken, async (req, res) => {
         { new: true }
       );
       return res.status(200).json(updatedProperty);
+
+      // return res.status(200).json(Property.currentOwner);
     }
   } catch (error) {
     return res.status(500).json(error.message);
@@ -120,17 +123,22 @@ propertyController.delete("/:id", verifyToken, async (req, res) => {
   try {
     const property = await Property.findById(req.param.id);
 
-    if (property.currentOwner !== req.user.id) {
+    if (property.currentOwner.toString() !== req.user.id.toString()) {
       throw new new Error(
         "You are not allowed to delete other people properties"
       )();
     } else {
       await property.delete();
 
-      return res.status(200).json(error.message);
+      return res.status(200).json({ msg: "Successfully deleted property" });
     }
   } catch (error) {
-    return res.status(500).json(error.message);
+    const property = await Property.find({});
+    //findById(req.param.id);
+    return res.status(500).json(
+      //error.message
+      property
+    );
   }
 });
 
