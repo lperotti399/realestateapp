@@ -17,11 +17,11 @@ app.use("/upload", uploadController);
 
 //mongodb connect
 const connectDB = (url) => {
+  mongoose.set("strictQuery", false);
   return mongoose.connect(url);
-  //mongoose.set("strictQuery", false);
 };
 
-module.exports = connectDB;
+//module.exports = connectDB;
 //starting server
 const port = process.env.PORT || 5000;
 const start = async () => {

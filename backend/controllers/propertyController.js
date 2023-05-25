@@ -133,11 +133,11 @@ propertyController.delete("/:id", verifyToken, async (req, res) => {
       return res.status(200).json({ msg: "Successfully deleted property" });
     }
   } catch (error) {
-    const property = await Property.find({});
+    //const property = await Property.find({});
     //findById(req.param.id);
     return res.status(500).json(
-      //error.message
-      property
+      error.message
+      //property
     );
   }
 });
